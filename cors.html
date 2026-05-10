@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CORS — Кога блокира?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=DM+Sans:wght@400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d0f14;
+      --bg2:       #13161e;
+      --bg3:       #1a1e29;
+      --border:    #252a38;
+      --text:      #c9d1e0;
+      --text-dim:  #5a6480;
+      --text-head: #eef1f8;
+      --green:     #3dd68c;
+      --green-bg:  #0d2b1e;
+      --red:       #f0605a;
+      --red-bg:    #2b0f0e;
+      --yellow:    #f5c518;
+      --yellow-bg: #2b2208;
+      --blue:      #58a6ff;
+      --blue-bg:   #0d1f35;
+      --mono:      'JetBrains Mono', monospace;
+      --sans:      'DM Sans', sans-serif;
+      --serif:     'DM Serif Display', serif;
+    }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 15px;
+      padding: 0 0 80px;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 64px 48px 48px;
+      border-bottom: 1px solid var(--border);
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    .hero-tag {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--green);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hero-tag::before {
+      content: '';
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+    }
+    .hero h1 {
+      font-family: var(--serif);
+      font-size: 52px;
+      color: var(--text-head);
+      line-height: 1.1;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+    .hero h1 span { color: var(--green); }
+    .hero p {
+      color: var(--text-dim);
+      font-size: 16px;
+      max-width: 560px;
+    }
+
+    /* ── Content ── */
+    .content {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 48px;
+    }
+
+    /* ── Section ── */
+    .section {
+      margin-top: 52px;
+    }
+    .section-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    .section h2 {
+      font-family: var(--serif);
+      font-size: 26px;
+      color: var(--text-head);
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+    .section > p {
+      color: var(--text);
+      margin-bottom: 16px;
+      max-width: 640px;
+    }
+
+    /* ── Code block ── */
+    .code-block {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 16px 0;
+      font-family: var(--mono);
+      font-size: 13px;
+    }
+    .code-header {
+      background: var(--bg3);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .code-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .code-lang {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-left: auto;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .code-body {
+      padding: 16px 20px;
+      white-space: pre;
+      overflow-x: auto;
+      line-height: 1.8;
+    }
+    .c-comment { color: #4a5568; }
+    .c-tag     { color: #79c0ff; }
+    .c-attr    { color: #d2a8ff; }
+    .c-val     { color: var(--green); }
+    .c-str     { color: #a5d6ff; }
+    .c-fn      { color: #ffa657; }
+    .c-kw      { color: #ff7b72; }
+    .c-ok      { color: var(--green); }
+    .c-err     { color: var(--red); }
+    .c-hdr     { color: var(--yellow); }
+
+    /* ── Result badge ── */
+    .result {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+    .result.ok  { background: var(--green-bg); color: var(--green); border: 1px solid #1a4d35; }
+    .result.err { background: var(--red-bg);   color: var(--red);   border: 1px solid #4d1a18; }
+    .result.warn{ background: var(--yellow-bg);color: var(--yellow);border: 1px solid #4d3a08; }
+
+    /* ── Note box ── */
+    .note {
+      background: var(--blue-bg);
+      border: 1px solid #1a3a5c;
+      border-left: 3px solid var(--blue);
+      border-radius: 6px;
+      padding: 14px 18px;
+      font-size: 14px;
+      color: #a0c4f0;
+      margin: 16px 0;
+    }
+    .note strong { color: var(--blue); font-weight: 600; }
+
+    /* ── Big Table ── */
+    .table-wrap {
+      margin-top: 52px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .table-title {
+      background: var(--bg3);
+      padding: 16px 24px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text-dim);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    thead th {
+      background: var(--bg2);
+      padding: 12px 20px;
+      text-align: left;
+      font-size: 11px;
+      font-family: var(--mono);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--bg2); }
+    tbody td {
+      padding: 13px 20px;
+      vertical-align: middle;
+    }
+    .td-code {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text-head);
+    }
+    .td-desc {
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge.no  { background: var(--green-bg); color: var(--green); }
+    .badge.yes { background: var(--red-bg);   color: var(--red);   }
+
+    /* ── Rule box ── */
+    .rule-box {
+      margin-top: 52px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 28px 32px;
+    }
+    .rule-box h3 {
+      font-family: var(--serif);
+      font-size: 22px;
+      color: var(--text-head);
+      margin-bottom: 16px;
+    }
+    .rule-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .rule-list li {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      font-size: 14px;
+    }
+    .rule-icon {
+      flex-shrink: 0;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      margin-top: 2px;
+    }
+    .rule-icon.ok  { background: var(--green-bg); color: var(--green); }
+    .rule-icon.bad { background: var(--red-bg);   color: var(--red);   }
+
+    /* ── Footer ── */
+    footer {
+      max-width: 860px;
+      margin: 64px auto 0;
+      padding: 24px 48px 0;
+      border-top: 1px solid var(--border);
+      color: var(--text-dim);
+      font-size: 13px;
+      font-family: var(--mono);
+      display: flex;
+      justify-content: space-between;
+    }
+    footer span { color: var(--green); }
+  </style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="hero-tag">Web Security / HTTP</div>
+    <h1>CORS —<br>кога <span>блокира</span>?</h1>
+    <p>Пълен справочник: кои браузърни механизми минават през CORS проверка и кои не.</p>
+  </div>
+
+  <div class="content">
+
+    <!-- 1. type=module -->
+    <div class="section">
+      <div class="section-num">01 —</div>
+      <h2>type="module"</h2>
+      <p>ES модулите <strong>винаги</strong> минават през CORS, дори и да са обикновен <code style="font-family:var(--mono);color:var(--yellow)">&lt;script&gt;</code> таг.</p>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dot" style="background:#ff5f57"></div>
+          <div class="code-dot" style="background:#febc2e"></div>
+          <div class="code-dot" style="background:#28c840"></div>
+          <span class="code-lang">HTML</span>
+        </div>
+        <div class="code-body"><span class="c-comment">&lt;!-- Обикновен script — без CORS --&gt;</span>
+<span class="c-tag">&lt;script</span> <span class="c-attr">src</span>=<span class="c-val">"https://cdn.com/lib.js"</span><span class="c-tag">&gt;&lt;/script&gt;</span>
+
+<span class="c-comment">&lt;!-- Module — минава през CORS! --&gt;</span>
+<span class="c-tag">&lt;script</span> <span class="c-attr">type</span>=<span class="c-val">"module"</span> <span class="c-attr">src</span>=<span class="c-val">"https://друг-домейн.com/mod.js"</span><span class="c-tag">&gt;&lt;/script&gt;</span></div>
+      </div>
+      <span class="result err">❌ CORS грешка ако сървърът няма Access-Control-Allow-Origin</span>
+      <div class="note" style="margin-top:12px">
+        <strong>Защо?</strong> Модулите са нов стандарт и умишлено са проектирани с CORS — по-сигурно поведение от legacy <code style="font-family:var(--mono)">&lt;script&gt;</code>.
+      </div>
+    </div>
+
+    <!-- 2. fetch / XHR -->
+    <div class="section">
+      <div class="section-num">02 —</div>
+      <h2>fetch() и XMLHttpRequest</h2>
+      <p>Всяка програмна HTTP заявка към друг домейн минава задължително през CORS.</p>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dot" style="background:#ff5f57"></div>
+          <div class="code-dot" style="background:#febc2e"></div>
+          <div class="code-dot" style="background:#28c840"></div>
+          <span class="code-lang">JavaScript</span>
+        </div>
+        <div class="code-body"><span class="c-comment">// ❌ CORS грешка — сървърът трябва да позволи</span>
+<span class="c-fn">fetch</span>(<span class="c-str">'https://друг-домейн.com/api/data.json'</span>)
+
+<span class="c-comment">// Браузърът изпраща preflight OPTIONS заявка:</span>
+<span class="c-hdr">OPTIONS</span> /api/data.json HTTP/1.1
+<span class="c-hdr">Origin:</span> https://моя-сайт.com
+<span class="c-hdr">Access-Control-Request-Method:</span> GET
+
+<span class="c-comment">// Сървърът трябва да отговори с:</span>
+<span class="c-hdr">Access-Control-Allow-Origin:</span> <span class="c-ok">*</span>
+<span class="c-hdr">Access-Control-Allow-Methods:</span> <span class="c-ok">GET, POST</span></div>
+      </div>
+      <span class="result err">❌ Блокирано без правилните хедъри</span>
+    </div>
+
+    <!-- 3. crossorigin атрибут -->
+    <div class="section">
+      <div class="section-num">03 —</div>
+      <h2>Атрибутът crossorigin — капан</h2>
+      <p>Добавянето на <code style="font-family:var(--mono);color:var(--yellow)">crossorigin</code> към <em>всеки</em> таг нарочно активира CORS режим, дори там където по подразбиране няма CORS.</p>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dot" style="background:#ff5f57"></div>
+          <div class="code-dot" style="background:#febc2e"></div>
+          <div class="code-dot" style="background:#28c840"></div>
+          <span class="code-lang">HTML</span>
+        </div>
+        <div class="code-body"><span class="c-comment">&lt;!-- Без crossorigin — работи нормално --&gt;</span>
+<span class="c-tag">&lt;script</span> <span class="c-attr">src</span>=<span class="c-val">"https://cdn.com/lib.js"</span><span class="c-tag">&gt;&lt;/script&gt;</span>     <span class="c-ok">✓ OK</span>
+
+<span class="c-comment">&lt;!-- С crossorigin — CORS се активира! --&gt;</span>
+<span class="c-tag">&lt;script</span> <span class="c-attr">crossorigin</span> <span class="c-attr">src</span>=<span class="c-val">"https://cdn.com/lib.js"</span><span class="c-tag">&gt;&lt;/script&gt;</span>  <span class="c-err">❌</span>
+
+<span class="c-comment">&lt;!-- Същото за img --&gt;</span>
+<span class="c-tag">&lt;img</span> <span class="c-attr">crossorigin</span> <span class="c-attr">src</span>=<span class="c-val">"https://cdn.com/photo.jpg"</span> <span class="c-tag">/&gt;</span>      <span class="c-err">❌</span></div>
+      </div>
+      <div class="note">
+        <strong>Защо изобщо се ползва?</strong> За да виждаш пълни stack traces в конзолата при JS грешки от CDN. Без него браузърът крие детайлите на грешката за сигурност. Но тогава CDN-ът трябва да поддържа CORS.
+      </div>
+    </div>
+
+    <!-- 4. @font-face -->
+    <div class="section">
+      <div class="section-num">04 —</div>
+      <h2>CSS @font-face от друг домейн</h2>
+      <p>Шрифтовете са специален случай — <strong>винаги</strong> минават през CORS, за разлика от изображения и скриптове.</p>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dot" style="background:#ff5f57"></div>
+          <div class="code-dot" style="background:#febc2e"></div>
+          <div class="code-dot" style="background:#28c840"></div>
+          <span class="code-lang">CSS</span>
+        </div>
+        <div class="code-body"><span class="c-comment">/* ❌ Не работи ако сървърът няма CORS хедър */</span>
+<span class="c-kw">@font-face</span> {
+  <span class="c-attr">font-family</span>: <span class="c-str">'MyFont'</span>;
+  <span class="c-attr">src</span>: <span class="c-fn">url</span>(<span class="c-str">'https://друг-домейн.com/font.woff2'</span>);
+}
+
+<span class="c-comment">/* ✓ Google Fonts работи защото те имат: */</span>
+<span class="c-hdr">Access-Control-Allow-Origin:</span> <span class="c-ok">*</span></div>
+      </div>
+      <span class="result err">❌ Шрифтът не се зарежда без CORS</span>
+    </div>
+
+    <!-- 5. Canvas tainted -->
+    <div class="section">
+      <div class="section-num">05 —</div>
+      <h2>Canvas + изображения от друг домейн</h2>
+      <p>Зареждането на изображението работи — но щом се опиташ да четеш пиксели, canvas се „замърсява" (tainted) и блокира.</p>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dot" style="background:#ff5f57"></div>
+          <div class="code-dot" style="background:#febc2e"></div>
+          <div class="code-dot" style="background:#28c840"></div>
+          <span class="code-lang">JavaScript</span>
+        </div>
+        <div class="code-body"><span class="c-kw">const</span> img = <span class="c-kw">new</span> <span class="c-fn">Image</span>();
+img.<span class="c-attr">src</span> = <span class="c-str">'https://друг-домейн.com/photo.jpg'</span>;
+ctx.<span class="c-fn">drawImage</span>(img, 0, 0);  <span class="c-ok">✓ Показва се</span>
+
+<span class="c-comment">// Но след това:</span>
+canvas.<span class="c-fn">toDataURL</span>();       <span class="c-err">❌ SecurityError: Tainted canvas</span>
+ctx.<span class="c-fn">getImageData</span>(...);   <span class="c-err">❌ SecurityError: Tainted canvas</span>
+
+<span class="c-comment">// Решение: добави crossorigin на img И CORS на сървъра</span>
+img.<span class="c-attr">crossOrigin</span> = <span class="c-str">'anonymous'</span>;  <span class="c-ok">✓ Работи с CORS хедър</span></div>
+      </div>
+      <span class="result warn">⚠️ Зарежда се, но четенето на пиксели е блокирано</span>
+    </div>
+
+    <!-- Summary table -->
+    <div class="table-wrap">
+      <div class="table-title">// Обобщена таблица — справочник</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Механизъм</th>
+            <th>CORS?</th>
+            <th>Бележка</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-code">&lt;script src&gt;</td>
+            <td><span class="badge no">❌ Не</span></td>
+            <td class="td-desc">Legacy — предхожда CORS</td>
+          </tr>
+          <tr>
+            <td class="td-code">&lt;script type="module"&gt;</td>
+            <td><span class="badge yes">✅ Да</span></td>
+            <td class="td-desc">Нов стандарт, умишлено с CORS</td>
+          </tr>
+          <tr>
+            <td class="td-code">&lt;script crossorigin&gt;</td>
+            <td><span class="badge yes">✅ Да</span></td>
+            <td class="td-desc">Атрибутът активира CORS режим</td>
+          </tr>
+          <tr>
+            <td class="td-code">fetch() / XMLHttpRequest</td>
+            <td><span class="badge yes">✅ Да</span></td>
+            <td class="td-desc">Всяка програмна заявка</td>
+          </tr>
+          <tr>
+            <td class="td-code">&lt;img src&gt;</td>
+            <td><span class="badge no">❌ Не</span></td>
+            <td class="td-desc">Зарежда се свободно</td>
+          </tr>
+          <tr>
+            <td class="td-code">&lt;img&gt; → Canvas четене</td>
+            <td><span class="badge yes">✅ Да</span></td>
+            <td class="td-desc">getImageData / toDataURL блокирано</td>
+          </tr>
+          <tr>
+            <td class="td-code">&lt;link rel="stylesheet"&gt;</td>
+            <td><span class="badge no">❌ Не</span></td>
+            <td class="td-desc">CSS файлове са свободни</td>
+          </tr>
+          <tr>
+            <td class="td-code">@font-face в CSS</td>
+            <td><span class="badge yes">✅ Да</span></td>
+            <td class="td-desc">Шрифтовете винаги минават CORS</td>
+          </tr>
+          <tr>
+            <td class="td-code">&lt;video&gt; / &lt;audio&gt;</td>
+            <td><span class="badge no">❌ Не</span></td>
+            <td class="td-desc">Зареждат се свободно</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Golden rule -->
+    <div class="rule-box">
+      <h3>Златното правило</h3>
+      <ul class="rule-list">
+        <li>
+          <div class="rule-icon ok">✓</div>
+          <div><strong style="color:var(--text-head)">Зареждане</strong> на ресурс (script, img, video, css) — <span style="color:var(--green)">без CORS</span>, освен шрифтове и модули.</div>
+        </li>
+        <li>
+          <div class="rule-icon bad">✗</div>
+          <div><strong style="color:var(--text-head)">Четене на съдържанието</strong> програмно (fetch, XHR, getImageData) — <span style="color:var(--red)">винаги CORS</span>.</div>
+        </li>
+        <li>
+          <div class="rule-icon bad">✗</div>
+          <div><strong style="color:var(--text-head)">crossorigin атрибут</strong> — нарочно активира CORS дори там където няма.</div>
+        </li>
+      </ul>
+    </div>
+
+  </div><!-- /content -->
+
+  <footer>
+    <span>CORS Reference</span> — Web Security Guide
+    <span style="color:var(--text-dim)">2026</span>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Шрифтове</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="page-grid">
+
+    <aside>
+        <h2>Уеб проект</h2>
+
+        <button class="menu-toggle" onclick="toggleMenu()" aria-label="Покажи меню">⋮</button>
+
+        <nav>
+            <ul>
+                <li><a href="index.html">Начало</a></li>
+                <li><a href="ai.html">AI промпт</a></li>
+                <li><a href="cyrillic.html">Българска кирилица</a></li>
+                <li><a href="about.html">За нас</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <header class="site-header" id="top">
+        <img src="logo.svg" alt="Лого на проекта" class="logo">
+        <div>
+            <h1>Статичен уеб сайт</h1>
+            <p>HTML, CSS Grid, JavaScript, адаптивен дизайн и българска кирилица</p>
+        </div>
+    </header>
+
+    <main>
+        <h2 class="page-title display-title">Използвани шрифтове</h2>
+		
+		<section class="card">
+		<h2>Използвани са шрифтове със свободни лицензи</h2>
+		<p>
+		Използван е шрифт Rafale BG като декоративен шрифт за заглавия. 
+		На страницата на <a href="https://localfonts.eu/freefonts/bulgarian-cyrillic/rafale-bg/">localfonts.eu</a> 
+		е посочен лиценз Fontfabric EULA Free Font License Ver. 2.0, 
+		който разрешава употреба като web-font чрез @font-face. 
+		За основния текст е използван Sofia Sans с резервни шрифтове.
+		</p>
+		</section>
+		
+		<h2 class="page-title display-title">Популярни шрифтове от Google Fonts</h2>
+		
+		<section class="card">
+            <h2>Variable fonts — какво са и защо са важни</h2>
+
+            <p>
+                Традиционният шрифт е отделен файл за всяка вариация: Regular.ttf, Bold.ttf, Italic.ttf, SemiBold.ttf — може да се наложи да заредиш 8–10 файла.
+Variable font е един-единствен файл, в който е закодиран целият диапазон от вариации. Контролираш ги с CSS така:
+            </p>
+			
+			<div class="code">
+font-variation-settings: 'wght' 650, 'ital' 0.5;
+			</div>
+
+			<p>
+				Стойността 650 е нещо, което преди просто не съществуваше — нямаше шрифт „SemiBold-and-a-bit". Сега можеш да пишеш всяко число в диапазона.
+				<br>
+				<b>Основните оси (axes), които поддържат повечето variable fonts:</b>
+
+				<ul>
+                <li>wght — дебелина, обикновено 100–900</li>
+				<li>ital — курсив, 0 или 1 (или плавно при някои)</li>
+				<li>slnt — наклон (slant), различно от курсив — текстът се накланя геометрично</li>
+				<li>wdth — ширина на буквите, 75%–125%</li>
+				<li>opsz — optical size — шрифтът се оптимизира за малък или голям размер автоматично</li>
+				</ul>
+			</p>
+			
+			<p>
+			В Google Fonts почти всичко вече е variable. Зареждаш с диапазон:
+			</p>
+			
+			<div class="code">font-family: 'Inter', sans-serif;
+/* wght 100..900 */</div>
+
+			<p>
+			Предимствата — по-малко HTTP заявки, по-малък общ размер, и безкрайна гъвкавост в дизайна без компромис с производителността.
+			</p>
+
+        </section>
+
+        <section class="card">
+            <h2>Имам ли право да ползвам този шрифт @import url('https://fonts.googleapis.com/css2</h2>
+
+            <p>
+                Да, имате пълното право да ползвате PT Sans за вашия дипломен проект и за училище. Той е част от библиотеката на Google Fonts и е лицензиран под SIL Open Font License (OFL), което означава, че е напълно безплатен за лична, образователна и търговска употреба.
+            </p>
+
+        </section>
+
+        <section class="card">
+            <h2>Откъде можем да намерим подходящи шрифтове?</h2>
+
+            <ul>
+                <li>Google Fonts</li>
+                <li>localfonts.eu</li>
+                <li>1001fonts.com</li>
+            </ul>
+
+            <p>
+                Важно е да се проверява лицензът на шрифта. Ако пише
+                „free for personal use only“, не е добра идея шрифтът да се
+                разпространява публично като част от проект.
+            </p>
+			
+			<div class="code">/* Вмъкване на Sofia Sans с поддръжка на българска кирилица */
+@import url('https://googleapis.com');
+
+body {
+    font-family: 'Sofia Sans', sans-serif;
+    /* Важно: Този ред активира българските форми в браузъра */
+    font-variant-ligatures: common-ligatures;
+    -webkit-font-feature-settings: "locl";
+    font-feature-settings: "locl";
+}
+</div>
+        </section>
+
+        <section class="card">
+            <h2>Относно адреса googleapis.com - може да се ползва за шрифтове напълно свободно</h2>
+
+            <p>
+                Това е официалният сървър на Google, от който браузърите теглят шрифтовете. Всички шрифтове, които се намират в библиотеката на Google Fonts, са с отворен лиценз (най-често OFL). Това означава, че:
+				<ul>
+                <li>Можете да ги ползвате в лични и комерсиални проекти.</li>
+                <li>Можете да ги показвате в училище и в дипломни работи.</li>
+                <li>Няма да имате проблеми с авторски права.</li>
+				</ul>
+            </p>
+
+        </section>
+		
+		<p>
+		Генерирани отговори от Google AI
+		</p>
+		<p>
+		Добре е да се провери кое от горните е вярно, тъй като до последно Google AI предлагаше да се ползва
+		<pre>@import url('https://googleapis.com');</pre>
+		а всъщност сработи с предложеното от ChatGPT:</p>
+		
+		<div class="code">@import url('https://fonts.googleapis.com/css2?family=Sofia+Sans:wght@400;700&display=swap');</div>
+		
+    </main>
+
+    <footer class="site-footer">
+        Проект по дисциплината „Дизайн и публикуване в интернет“
+    </footer>
+
+    <a href="#top" class="back-to-top" aria-label="Върни се в началото">↑</a>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>

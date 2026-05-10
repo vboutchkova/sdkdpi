@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Начало</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="page-grid">
+
+    <aside>
+        <h2>Уеб проект</h2>
+
+        <button class="menu-toggle" onclick="toggleMenu()" aria-label="Покажи меню">⋮</button>
+
+        <nav>
+            <ul>
+                <li><a href="index.html">Начало</a></li>
+                <li><a href="ai.html">AI промпт</a></li>
+                <li><a href="cyrillic.html">Българска кирилица</a></li>
+				<li><hr></li>
+				<li><a href="fonts.html">Шрифтове</a></li>
+				<li><a href="cors.html">CORS</a></li>
+                <li><a href="about.html">За нас</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <header class="site-header" id="top">
+        <img src="logo.svg" alt="Лого на проекта" class="logo">
+        <div>
+            <h1>Статичен уеб сайт</h1>
+            <p>HTML, CSS Grid, JavaScript, адаптивен дизайн и българска кирилица</p>
+        </div>
+    </header>
+
+    <main>
+        <h2 class="page-title">Проект по „Дизайн и публикуване в интернет“</h2>
+
+        <section class="card">
+            <h2>Тема на сайта</h2>
+
+            <p>
+                Това е примерен уеб сайт за ученици от 11. клас:
+                как се прави статичен уеб сайт с HTML, CSS и евентуално JavaScript,
+                адаптивен дизайн и българска кирилица. 
+				Има две допълнителни теми за авторските права и лицензи на шрифтовете,
+				както и CORS за допълнителни знания.
+            </p>
+        </section>
+
+        <section class="card">
+            <h2>Изисквания към проекта</h2>
+
+            <ul>
+                <li>Използване на CSS Grid.</li>
+                <li>Адаптивен дизайн за мобилен телефон и настолен компютър.</li>
+                <li>Стилове за печат чрез <code>@media print</code>.</li>
+                <li>Няколко HTML страници.</li>
+                <li>Използване на JavaScript e разрешено.</li>
+                <li>Шрифт с българска форма на кирилицата с подходящ лиценз.</li>
+                <li>Сайтът да бъде на български език.</li>
+            </ul>
+
+            <button onclick="showMessage()">Покажи съобщение</button>
+        </section>
+
+        <section class="card">
+            <h2>Как е направен сайтът</h2>
+
+            <p>
+                Изполвани са CSS Grid, като сайтът е респонсив и
+                се променя при малък екран. Изборът на шрифт е направен
+				с помощтта на Google AI и може да се види на страницата
+                <a href="fonts.html">Шрифтове</a>.
+            </p>
+
+            <p>
+                За по-любознателните може да се добави и тема за CORS:
+                защо браузърът ограничава заявки между различни домейни
+                и защо някои външни скриптове работят, когато са включени
+                чрез <code>&lt;script src="..."&gt;</code>.
+				Страницата за <a href="cors.html">CORS</a> 
+				e генерирана от Claude, Sonnet 4.6.
+            </p>
+        </section>
+
+    </main>
+
+    <footer class="site-footer">
+        Проект по „Дизайн и публикуване в интернет“, 2026
+    </footer>
+
+    <a href="#top" class="back-to-top" aria-label="Върни се в началото">↑</a>
+
+</div>
+
+
+</body>
+</html>
